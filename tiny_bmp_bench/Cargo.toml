@@ -1,0 +1,15 @@
+[package]
+name = "tiny_bmp_bench"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rand = "0.5.2"
+criterion = "0.2.3"
+tiny_bmp = { path = "../tiny_bmp" }
+
+[[bench]]
+name = "color2gray"
+harness = false
