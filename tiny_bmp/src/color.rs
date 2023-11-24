@@ -1,33 +1,28 @@
-#[derive(Debug)]
-pub struct Color
-{
+#[derive(Debug,Clone)]
+pub struct Color{
     r : u8,
     g : u8,
     b : u8,
 }
 
-impl Color 
-{
-    pub fn new (r: u8,g: u8,b: u8) -> Color 
-    {
+impl Color {
+    pub fn new (r: u8,g: u8,b: u8) -> Color {
         Color{ r, g, b, }
     }
 
-    pub fn r (&self) -> u8 
-    {
+    pub fn r (&self) -> u8 {
         return self.r;
     }
 
-    pub fn g (&self) -> u8
-     {
+    pub fn g (&self) -> u8{
         return self.g;
     }
 
-    pub fn b (&self) -> u8 
-    {
+    pub fn b (&self) -> u8 {
         return self.b;
     }
 
+    //Convert color to gray scale
     pub fn color_to_gray(&mut self) {
         let rg = self.r as f64 * 0.2126;
         let gg = self.g as f64 * 0.7152;
@@ -38,30 +33,23 @@ impl Color
         self.b = gray;
     }
 
-    // #[inline]
-    // pub fn color_to_gray_AVX(&mut self,m: std::arch::x86_64::__m256d)
-    // {
-    //     if is_x86_feature_detected!("avx") 
-    //     {
-    //         unsafe 
-    //         {
-    //             let s = std::arch::x86_64::_mm256_set_pd(self.r as f64, self.g as f64, self.b as f64, 0.0);
-    //             // let m = std::arch::x86_64::_mm256_set_pd(0.2126, 0.7152, 0.0722, 0.0);
-    //             let sm = std::arch::x86_64::_mm256_mul_pd(s, m);
+    //linear interpolation
+    pub fn linear_interpolation(color_a : &Color, color_b : &Color, a_rate : f64) -> Result<Color,&'static str> {
+        if a_rate > 1.0 || a_rate < 0.0 {
+            return Err("color linear interpolation err: rate rang wrong");
+        }
+        let b_rate = 1.0 - a_rate;
+        let r = (color_a.r as f64 * a_rate + color_b.r as f64 * b_rate) as u8;
+        let g = (color_a.g as f64 * a_rate + color_b.g as f64 * b_rate) as u8;
+        let b= (color_a.b as f64 * a_rate + color_b.b as f64 * b_rate) as u8;
+        return Ok(Color::new(r, g, b));
+    }
+}
 
-    //             let unpacked: (f64, f64, f64, f64) = std::mem::transmute(sm);
-
-    //             let gray = (unpacked.1 + unpacked.2 + unpacked.3).round() as u8;
-    //             self.r = gray;
-    //             self.g = gray;
-    //             self.b = gray;
-    //         }
-    //     }
-    //     else {
-    //         self.color_to_gray()
-    //     }
-    // }
-
+impl PartialEq for Color {
+    fn eq(&self, other: &Self) -> bool {
+        self.r == other.r && self.g == other.g && self.b == other.b
+    }
 }
 
 #[cfg(test)]
@@ -70,8 +58,16 @@ mod test_color {
 
     #[test]
     fn sample_tests() {
-        let mut red = Color::new(255, 255, 255);
-        red.color_to_gray();
-        println!("{:?}",red);
+        let mut black = Color::new(255, 255, 255);
+        let mut white = Color::new(0, 0, 0);
+        black.color_to_gray();
+        white.color_to_gray();
+        assert_eq!(black,Color::new(255, 255, 255));
+        assert_eq!(white,Color::new(0, 0, 0));
+
+        let mid_color_result = Color::linear_interpolation(&black,&white,0.5);
+        assert!(mid_color_result.is_ok());
+        let mid_color = mid_color_result.unwrap();
+        assert!(mid_color.r >= 127 && mid_color.r <= 128);//float precision
     }
 }

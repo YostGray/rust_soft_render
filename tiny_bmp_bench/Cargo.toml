@@ -11,5 +11,5 @@ criterion = "0.2.3"
 tiny_bmp = { path = "../tiny_bmp" }
 
 [[bench]]
-name = "color2gray"
+name = "color_bench"
 harness = false
