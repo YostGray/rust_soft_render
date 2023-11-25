@@ -330,6 +330,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "rust_tiny_img"
+version = "0.1.0"
+
+[[package]]
 name = "rustc_version"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -417,16 +421,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "tiny_bmp"
-version = "0.1.0"
-
-[[package]]
-name = "tiny_bmp_bench"
+name = "tiny_img_bench"
 version = "0.1.0"
 dependencies = [
  "criterion",
  "rand",
- "tiny_bmp",
+ "rust_tiny_img",
 ]
 
 [[package]]

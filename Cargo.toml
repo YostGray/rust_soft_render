@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
 members = [
-    "tiny_bmp",
-    "tiny_bmp_bench",
+    "rust_tiny_img",
+    "tiny_img_bench",
 ]

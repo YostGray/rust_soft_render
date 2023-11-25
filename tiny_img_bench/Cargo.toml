@@ -1,5 +1,5 @@
 [package]
-name = "tiny_bmp_bench"
+name = "tiny_img_bench"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 rand = "0.5.2"
 criterion = "0.2.3"
-tiny_bmp = { path = "../tiny_bmp" }
+rust_tiny_img = { path = "../rust_tiny_img" }
 
 [[bench]]
 name = "color_bench"

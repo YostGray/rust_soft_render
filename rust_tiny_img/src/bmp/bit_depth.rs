@@ -4,6 +4,7 @@ pub enum BitDepth {
     Color16Bit = 4,
     Color256Bit = 8,
     AllColors = 24,
+    AllColorsAndShades = 32,
 }
 
 impl BitDepth {
@@ -23,6 +24,7 @@ impl BitDepth {
             Self::Color16Bit => 4,
             Self::Color256Bit => 8,
             Self::AllColors => 3,
+            Self::AllColorsAndShades => 4,
         }
     }
 
