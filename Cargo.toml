@@ -2,5 +2,6 @@
 resolver = "2"
 members = [
     "rust_tiny_img",
-    "tiny_img_bench",
+    "rust_learn_ray_tracing",
+    "rust_bench",
 ]

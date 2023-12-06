@@ -1,15 +1,17 @@
 [package]
-name = "tiny_img_bench"
+name = "rust_learn_ray_tracing"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rand = "0.5.2"
-criterion = "0.2.3"
-rust_tiny_img = { path = "../rust_tiny_img" }
 
-[[bench]]
-name = "color_bench"
-harness = false
+
+[lib]
+name = "rust_learn_ray_tracing"
+path = "src/lib.rs"
+
+[[bin]]
+name = "rt_run"
+path = "src/main.rs"

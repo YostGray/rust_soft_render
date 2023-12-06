@@ -6,7 +6,6 @@ mod color_table;
 
 use crate::{img::Img, bmp::bmp_file::BMPFile};
 use self::bit_depth::BitDepth;
-use std::error::Error;
 use std::io::Write;
 
 fn save_as_file(img:&Img, filename: &str, bit_depth: BitDepth) -> Result<(), String> {
@@ -15,14 +14,14 @@ fn save_as_file(img:&Img, filename: &str, bit_depth: BitDepth) -> Result<(), Str
     let mut file = match std::fs::File::create(filename) {
         Err(why) => {
             return Err(
-                format!("Couldn't create {}: {}", filename, why.description()).to_owned(),
+                format!("Couldn't create {}: {}", filename, why.to_string()).to_owned(),
             )
         }
         Ok(file) => file,
     };
     match file.write_all(bit_stream.as_mut_slice()) {
         Err(why) => {
-            Err(format!("Couldn't write to {}: {}", filename, why.description()).to_owned())
+            Err(format!("Couldn't write to {}: {}", filename, why.to_string()).to_owned())
         }
         Ok(_) => Ok(()),
     }

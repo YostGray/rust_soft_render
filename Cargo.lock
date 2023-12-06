@@ -330,6 +330,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "rust_bench"
+version = "0.1.0"
+dependencies = [
+ "criterion",
+ "rand",
+ "rust_learn_ray_tracing",
+ "rust_tiny_img",
+]
+
+[[package]]
+name = "rust_learn_ray_tracing"
+version = "0.1.0"
+
+[[package]]
 name = "rust_tiny_img"
 version = "0.1.0"
 
@@ -418,15 +432,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d326610f408c7a4eb6f51c37c330e496b08506c9457c9d34287ecc38809fb060"
 dependencies = [
  "unicode-width",
-]
-
-[[package]]
-name = "tiny_img_bench"
-version = "0.1.0"
-dependencies = [
- "criterion",
- "rand",
- "rust_tiny_img",
 ]
 
 [[package]]

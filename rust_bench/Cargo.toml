@@ -1,0 +1,16 @@
+[package]
+name = "rust_bench"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rand = "0.5.2"
+criterion = "0.2.3"
+rust_tiny_img = { path = "../rust_tiny_img" }
+rust_learn_ray_tracing = { path = "../rust_learn_ray_tracing" }
+
+[[bench]]
+name = "vector_bench"
+harness = false
