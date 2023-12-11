@@ -1,3 +1,5 @@
+use std::thread;
+
 use rust_tiny_img::{img::Img, color::{Color, self}};
 use rand::{Rng, thread_rng, rngs::ThreadRng};
 use crate::rt_lib::ray::Ray;
@@ -100,19 +102,38 @@ impl Camera {
     }
 
     ///render scene with camera
-    pub fn render(&self, s : &Scene) -> Img{
+    pub fn render(&self, s:&Scene, depth:u64) -> Img{
         let sw = self.get_w();
         let sh = self.get_h();
 
         let mut img = rust_tiny_img::img::Img::new(sw, sh);
+        let start_pos = self.get_piexl_view_pos_start_pos();
+        let mut rng = thread_rng();
 
         println!("start render");
 
-        let start_pos = self.get_piexl_view_pos_start_pos();
-        let mut rng = thread_rng();
-        for w in 0..sw {
-            println!("remaining:{} col",sw - w);
-            for h in 0..sh {
+        for h in 0..sh {
+            println!("remaining:{} row",sh - h);
+            for w in 0..sw {
+                // let sample_pre_pixel = self.sample_pre_pixel;
+                // let handle = thread::spawn(move || {
+                //     let color : Color;
+                //     let start_pos = self.get_piexl_view_pos_start_pos();
+                //     let mut rng = thread_rng();
+                //     if sample_pre_pixel > 1 {
+                //         let mut r = 0.0;
+                //         let mut g = 0.0;
+                //         let mut b = 0.0;
+                //         let rate: f64 = 1.0 / sample_pre_pixel as f64;
+                //         for i in 0..sample_pre_pixel {
+                //             let ray = self.get_ray(&start_pos,w,h,&mut rng);
+                //             let color = ray.get_color(s,depth);
+                //             r += color.r() as f64;
+                //             g += color.g() as f64;
+                //             b += color.b() as f64;
+                //         }
+                //     }
+                // });
                 let color;
                 if self.sample_pre_pixel > 1 {
                     // let mut final_color = Color::get_black();
@@ -122,7 +143,7 @@ impl Camera {
                     let rate: f64 = 1.0 / self.sample_pre_pixel as f64;
                     for i in 0..self.sample_pre_pixel {
                         let ray = self.get_ray(&start_pos,w,h,&mut rng);
-                        let color = ray.get_color(s);
+                        let color = ray.get_color(s,depth);
                         r += color.r() as f64;
                         g += color.g() as f64;
                         b += color.b() as f64;
@@ -135,7 +156,7 @@ impl Camera {
                 else {
                     let dir = self.get_piexl_view_pos(&start_pos, w, h);
                     let ray = Ray::new(self.get_pos(),dir - self.get_pos());
-                    color = ray.get_color(s);
+                    color = ray.get_color(s,depth);
                 }
                 match img.set_pixel(w, h, color) {
                     Err(msg) => {

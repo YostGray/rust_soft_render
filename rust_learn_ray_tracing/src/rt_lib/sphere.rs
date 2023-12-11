@@ -1,3 +1,5 @@
+use rand::thread_rng;
+
 use super::{vector3::Vector3, geometry::{Geometry, HitReultEnum, HitResult}, ray::Ray};
 
 pub struct Sphere{
@@ -10,6 +12,23 @@ impl Sphere {
         Sphere{
             r,
             pos:pos.clone(),
+        }
+    }
+
+    fn get_reflect_dir(&self, ray:&Ray, normal:&Vector3) -> Vector3 {
+        // //镜面反射
+        // let n = normal;
+        // let i = -ray.get_dir().clone();
+        // let o = -i + n * 2.0 * i.dot(n);
+        // return o;
+
+        //随机漫反射
+        let mut rng = thread_rng();
+        let mut o = Vector3::random(&mut rng, -1.0, 1.0);
+        o.normallize();
+        match o.dot(normal) > 0.0 {
+            true => o,
+            false => -o,
         }
     }
 }
@@ -35,7 +54,8 @@ impl Geometry for Sphere {
                 let pos = ray.at(t);
                 let mut normal = pos - self.pos;
                 normal.normallize();
-                HitReultEnum::Ruslt(HitResult::new(pos, normal, t))
+                let reflect_dir = self.get_reflect_dir(ray,&normal);
+                HitReultEnum::Ruslt(HitResult::new(pos, normal, t, reflect_dir))
             },
         }
     }

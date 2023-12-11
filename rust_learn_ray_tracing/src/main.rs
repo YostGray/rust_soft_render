@@ -19,7 +19,7 @@ fn main(){
         16,
     );
 
-    let img = c.render(&s);
+    let img = c.render(&s,50);
     match bmp::save_as_file(&img, "./test_out/test08.bmp",BitDepth::AllColors) {
         Err(msg) => {
             panic!("{}",msg);

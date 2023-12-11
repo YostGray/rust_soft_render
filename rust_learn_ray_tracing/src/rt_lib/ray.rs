@@ -17,7 +17,7 @@ impl Ray {
     pub fn get_ori(&self) -> &Vector3 {
         &self.ori
     }
-    
+
     pub fn get_dir(&self) -> &Vector3 {
         &self.dir
     }
@@ -26,11 +26,14 @@ impl Ray {
         self.ori + self.dir * t
     }
 
-    pub fn get_color(&self,s : &Scene) -> Color{
+    pub fn get_color(&self, s:&Scene, depth:u64) -> Color{
+        if depth <= 0  {
+            return Color::get_black();
+        }
         match s.try_hit(self) {
             HitReultEnum::Ruslt(r) => {
-                let n = r.get_normal();
-                Color::new((n.get_x() * 255.0) as u8, (n.get_y() * 255.0) as u8, (n.get_z() * 255.0) as u8, 255u8)
+                let reflect_ray = Ray::new(r.get_pos().clone(), r.get_reflect_dir().clone());
+                reflect_ray.get_color(s,depth - 1) * 0.5
             },
             HitReultEnum::None => {
                 let test = 0.5 * (self.dir.get_y() + 1.0);
