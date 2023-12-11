@@ -1,4 +1,4 @@
-use std::ops::{Mul, Add};
+use std::ops::{Mul, Add, AddAssign};
 
 
 ///Color, which is basic unit of img.
@@ -79,12 +79,20 @@ impl Mul<f64> for Color {
     type Output = Color;
 
     fn mul(self, rhs: f64) -> Self::Output {
-        Self::Output {
-            r: (self.r as f64 * rhs) as u8 ,
-            g: (self.g as f64 * rhs) as u8,
-            b: (self.b as f64 * rhs) as u8,
-            a: (self.a as f64 * rhs) as u8,
-        }
+        let r = (self.r as f64 * rhs) as u8;
+        let g = (self.g as f64 * rhs) as u8;
+        let b = (self.b as f64 * rhs) as u8;
+        let a = (self.a as f64 * rhs) as u8;
+        Self::Output {r,g,b,a,}
+    }
+}
+
+impl AddAssign for Color {
+    fn add_assign(&mut self, rhs: Self) {
+        self.r += rhs.r;
+        self.g += rhs.g;
+        self.b += rhs.b;
+        self.a += rhs.a;
     }
 }
 

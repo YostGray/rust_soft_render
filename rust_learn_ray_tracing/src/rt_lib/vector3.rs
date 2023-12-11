@@ -1,5 +1,7 @@
 use std::ops::{Add, Sub, Neg, AddAssign, Mul, Div, DivAssign};
 
+use rand::{rngs::ThreadRng, Rng};
+
 
 ///Vector, which could present a pint or a vector quantity.
 #[derive(Debug, Clone, Copy)]
@@ -163,6 +165,14 @@ impl Vector3 {
 
     pub fn normallized(&self) -> Vector3{
         *self / self.length()
+    }
+
+    pub fn random(rng:&mut ThreadRng,min:f64,max:f64) -> Vector3 {
+        Vector3 {
+            x:rng.gen_range(min..max),
+            y:rng.gen_range(min..max),
+            z:rng.gen_range(min..max),
+        }
     }
 }
 

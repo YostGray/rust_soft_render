@@ -5,3 +5,6 @@ members = [
     "rust_learn_ray_tracing",
     "rust_bench",
 ]
+
+[workspace.dependencies]
+rand = "0.8.5"

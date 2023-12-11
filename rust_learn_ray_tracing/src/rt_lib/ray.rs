@@ -1,5 +1,6 @@
 use rust_tiny_img::color::Color;
 
+use super::scene::Scene;
 use super::{vector3::Vector3, geometry::Geometry};
 use super::geometry::HitReultEnum;
 
@@ -25,13 +26,13 @@ impl Ray {
         self.ori + self.dir * t
     }
 
-    pub fn get_color(&self,ge:&dyn Geometry) -> Color{
-        match ge.try_hit(self) {
+    pub fn get_color(&self,s : &Scene) -> Color{
+        match s.try_hit(self) {
             HitReultEnum::Ruslt(r) => {
                 let n = r.get_normal();
                 Color::new((n.get_x() * 255.0) as u8, (n.get_y() * 255.0) as u8, (n.get_z() * 255.0) as u8, 255u8)
             },
-            _ => {
+            HitReultEnum::None => {
                 let test = 0.5 * (self.dir.get_y() + 1.0);
                 Color::get_white() *(1.0 - test) + Color::new(127u8, 178u8, 255u8, 255u8) * test
             },
