@@ -13,7 +13,7 @@ fn bench_devide(c: &mut Criterion) {
     c.bench_function("vector3 divide", move |b| {
         b.iter(|| {
             let v3 = Vector3::new(rng.gen(),rng.gen(),rng.gen());
-            &v3 / 2.0f64;
+            let _ = v3 / 2.0f64;
         })
     });
 }

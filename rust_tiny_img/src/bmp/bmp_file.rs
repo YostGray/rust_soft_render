@@ -5,6 +5,8 @@ use super::color_table::ColorTable;
 use super::dib_header::DIBHeader;
 
 /// the struct of .bmp file
+/// 
+/// more info: https://en.wikipedia.org/wiki/BMP_file_format
 pub struct BMPFile {
     header: BMPHeader,
     dib_header: DIBHeader,
@@ -13,7 +15,7 @@ pub struct BMPFile {
 }
 
 impl BMPFile {
-    pub fn from_inner(img : &Img,bit_depth: BitDepth) -> BMPFile {
+    pub fn from_inner_img(img : &Img,bit_depth: BitDepth) -> BMPFile {
         let dib_header = DIBHeader::from(img,bit_depth);
         let dib_header_size = dib_header.get_byte_size();
 

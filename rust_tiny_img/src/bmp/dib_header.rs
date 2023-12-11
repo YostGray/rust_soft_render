@@ -3,7 +3,7 @@ use crate::img::Img;
 use super::bit_depth::BitDepth;
 
 
-//Common support version, without OS/2
+///Common support version, without OS/2
 pub struct DIBHeader{
     /// specifies the size of the BitMapFileHeader structure, in bytes, as now it's 40
     size: u32,

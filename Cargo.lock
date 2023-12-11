@@ -342,6 +342,9 @@ dependencies = [
 [[package]]
 name = "rust_learn_ray_tracing"
 version = "0.1.0"
+dependencies = [
+ "rust_tiny_img",
+]
 
 [[package]]
 name = "rust_tiny_img"

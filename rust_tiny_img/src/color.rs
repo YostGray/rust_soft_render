@@ -1,3 +1,5 @@
+use std::ops::{Mul, Add};
+
 
 ///Color, which is basic unit of img.
 #[derive(Debug,Clone)]
@@ -57,6 +59,42 @@ impl Color {
 impl PartialEq for Color {
     fn eq(&self, other: &Self) -> bool {
         self.r == other.r && self.g == other.g && self.b == other.b
+    }
+}
+
+impl Add for Color {
+    type Output = Color;
+
+    fn add(self, rhs: Color) -> Self::Output {
+        Self::Output {
+            r: self.r + rhs.r,
+            g: self.g + rhs.g,
+            b: self.b + rhs.b,
+            a: self.a + rhs.a,
+        }
+    }
+}
+
+impl Mul<f64> for Color {
+    type Output = Color;
+
+    fn mul(self, rhs: f64) -> Self::Output {
+        Self::Output {
+            r: (self.r as f64 * rhs) as u8 ,
+            g: (self.g as f64 * rhs) as u8,
+            b: (self.b as f64 * rhs) as u8,
+            a: (self.a as f64 * rhs) as u8,
+        }
+    }
+}
+
+impl Color {
+    pub fn get_white() -> Color {
+        Color::new(255u8, 255u8, 255u8, 255u8)
+    }
+
+    pub fn get_black() -> Color {
+        Color::new(0u8,0u8, 0u8,0u8)
     }
 }
 

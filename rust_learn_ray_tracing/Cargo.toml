@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-
+rust_tiny_img = { path = "../rust_tiny_img" }
 
 [lib]
 name = "rust_learn_ray_tracing"

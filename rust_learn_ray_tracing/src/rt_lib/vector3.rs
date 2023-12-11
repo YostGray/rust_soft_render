@@ -2,7 +2,7 @@ use std::ops::{Add, Sub, Neg, AddAssign, Mul, Div, DivAssign};
 
 
 ///Vector, which could present a pint or a vector quantity.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Vector3{
     x : f64,
     y : f64,
@@ -12,6 +12,16 @@ pub struct Vector3{
 impl Vector3 {
     pub fn new(x: f64,y: f64,z: f64) -> Vector3 {
         Vector3{x,y,z}
+    }
+
+    pub fn get_x(&self) -> f64 {
+        return self.x;
+    }
+    pub fn get_y(&self) -> f64 {
+        return self.y;
+    }
+    pub fn get_z(&self) -> f64 {
+        return self.z;
     }
 }
 
@@ -23,13 +33,13 @@ impl Default for Vector3 {
 
 impl PartialEq for Vector3 {
     fn eq(&self, other: &Self) -> bool {
-        (self - other).length_sqr() < 1e-8f64
+        (*self - *other).length_sqr() < 1e-8f64
     }
 }
 
 //math operations 👇
 
-impl Add for &Vector3 {
+impl Add for Vector3 {
     type Output = Vector3;
 
     fn add(self, rhs: Self) -> Self::Output {
@@ -41,7 +51,7 @@ impl Add for &Vector3 {
     }
 }
 
-impl Sub for &Vector3 {
+impl Sub for Vector3 {
     type Output = Vector3;
 
     fn sub(self, rhs: Self) -> Self::Output {
@@ -53,7 +63,7 @@ impl Sub for &Vector3 {
     }
 }
 
-impl Neg for &Vector3 {
+impl Neg for Vector3 {
     type Output = Vector3;
 
     fn neg(self) -> Self::Output {
@@ -61,6 +71,18 @@ impl Neg for &Vector3 {
             x:-self.x,
             y:-self.y,
             z:-self.z,
+        }
+    }
+}
+
+impl Mul<f64> for Vector3 {
+    type Output = Vector3;
+
+    fn mul(self, rhs: f64) -> Self::Output {
+        Vector3 {
+            x:self.x * rhs,
+            y:self.y * rhs,
+            z:self.z * rhs,
         }
     }
 }
@@ -77,7 +99,8 @@ impl Mul<f64> for &Vector3 {
     }
 }
 
-impl Div<f64> for &Vector3 {
+
+impl Div<f64> for Vector3 {
     type Output = Vector3;
 
     fn div(self, rhs: f64) -> Self::Output {
@@ -139,7 +162,7 @@ impl Vector3 {
     }
 
     pub fn normallized(&self) -> Vector3{
-        self / self.length()
+        *self / self.length()
     }
 }
 
@@ -159,9 +182,9 @@ mod test_vector3 {
         assert_eq!(one.normallized(),one_mut);
 
         assert_ne!(one,one_mut);
-        assert_eq!(&one * 2f64,&one + &one);
-        assert_eq!(&one / 2f64,half_one);
-        assert_eq!(&one - &one,Vector3::default());
+        assert_eq!(one * 2f64,one + one);
+        assert_eq!(one / 2f64,half_one);
+        assert_eq!(one - one,Vector3::default());
 
         assert_eq!(one.dot(&one),3f64);
 

@@ -1,17 +1,20 @@
 mod bmp_header;
 mod dib_header;
 mod bmp_file;
-mod bit_depth;
+pub mod bit_depth;
 mod color_table;
 
 use crate::{img::Img, bmp::bmp_file::BMPFile};
 use self::bit_depth::BitDepth;
 use std::io::Write;
 
-fn save_as_file(img:&Img, filename: &str, bit_depth: BitDepth) -> Result<(), String> {
-    let file = BMPFile::from_inner(img, bit_depth);
+pub fn save_as_file(img:&Img, filename: &str, bit_depth: BitDepth) -> Result<(), String> {
+    let file = BMPFile::from_inner_img(img, bit_depth);
     let mut bit_stream = file.to_bytes();
-    let mut file = match std::fs::File::create(filename) {
+
+    let save_path = std::path::Path::new(filename);
+    std::fs::create_dir_all(save_path.parent().unwrap()).unwrap();
+    let mut file = match std::fs::File::create(save_path) {
         Err(why) => {
             return Err(
                 format!("Couldn't create {}: {}", filename, why.to_string()).to_owned(),
