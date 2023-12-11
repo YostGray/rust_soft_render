@@ -19,8 +19,12 @@ fn main(){
         16,
     );
 
-    let img = c.render(&s,50);
-    match bmp::save_as_file(&img, "./test_out/test08.bmp",BitDepth::AllColors) {
+    let start = std::time::Instant::now();
+    let img = c.render(s,50);
+    let duration = start.elapsed();
+    println!("Time cost in render() is: {:?}", duration);
+
+    match bmp::save_as_file(&img, "./test_out/test09.bmp",BitDepth::AllColors) {
         Err(msg) => {
             panic!("{}",msg);
         },

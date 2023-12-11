@@ -5,7 +5,7 @@ use super::geometry::{Geometry, HitReultEnum};
 
 ///the scene which would be render
 pub struct Scene {
-    obj_list:Vec<Box<dyn Geometry>>,
+    obj_list:Vec<Box<dyn Geometry + Sync + Send>>,
 }
 
 impl Scene {
@@ -15,11 +15,11 @@ impl Scene {
         } 
     }
 
-    pub fn add_obj(&mut self,obj:Box<dyn Geometry>) {
+    pub fn add_obj(&mut self,obj:Box<dyn Geometry + Sync + Send>) {
         self.obj_list.push(obj);
     }
 
-    fn get_obj_vec(&self) -> &Vec<Box<dyn Geometry>>{
+    fn get_obj_vec(&self) -> &Vec<Box<dyn Geometry + Sync + Send>>{
         &self.obj_list
     }
 }

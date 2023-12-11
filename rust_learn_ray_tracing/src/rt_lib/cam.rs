@@ -1,4 +1,4 @@
-use std::thread;
+use std::{thread, sync::{Arc, Mutex}, time::Duration};
 
 use rust_tiny_img::{img::Img, color::{Color, self}};
 use rand::{Rng, thread_rng, rngs::ThreadRng};
@@ -7,6 +7,7 @@ use super::{vector3::Vector3, scene::Scene};
 
 /// the view point to render scene.
 /// use left hand coordinary.
+#[derive(Clone, Copy)]
 pub struct Camera {
     screen_w : u32,
     screen_h : u32,
@@ -102,70 +103,86 @@ impl Camera {
     }
 
     ///render scene with camera
-    pub fn render(&self, s:&Scene, depth:u64) -> Img{
+    pub fn render(&self, s:Scene, depth:u64) -> Img{
         let sw = self.get_w();
         let sh = self.get_h();
 
         let mut img = rust_tiny_img::img::Img::new(sw, sh);
-        let start_pos = self.get_piexl_view_pos_start_pos();
-        let mut rng = thread_rng();
 
         println!("start render");
 
+        let start_pos = self.get_piexl_view_pos_start_pos();
+
+        let shared_s = Arc::new(s);
+        let shared_c = Arc::new(self.clone());
+        let shared_img = Arc::new(Mutex::new(img));
+
+        let mut thread_num = 0;
+        let shared_thread_num = Arc::new(Mutex::new(thread_num));
+
         for h in 0..sh {
-            println!("remaining:{} row",sh - h);
-            for w in 0..sw {
-                // let sample_pre_pixel = self.sample_pre_pixel;
-                // let handle = thread::spawn(move || {
-                //     let color : Color;
-                //     let start_pos = self.get_piexl_view_pos_start_pos();
-                //     let mut rng = thread_rng();
-                //     if sample_pre_pixel > 1 {
-                //         let mut r = 0.0;
-                //         let mut g = 0.0;
-                //         let mut b = 0.0;
-                //         let rate: f64 = 1.0 / sample_pre_pixel as f64;
-                //         for i in 0..sample_pre_pixel {
-                //             let ray = self.get_ray(&start_pos,w,h,&mut rng);
-                //             let color = ray.get_color(s,depth);
-                //             r += color.r() as f64;
-                //             g += color.g() as f64;
-                //             b += color.b() as f64;
-                //         }
-                //     }
-                // });
-                let color;
-                if self.sample_pre_pixel > 1 {
-                    // let mut final_color = Color::get_black();
-                    let mut r = 0.0;
-                    let mut g = 0.0;
-                    let mut b = 0.0;
-                    let rate: f64 = 1.0 / self.sample_pre_pixel as f64;
-                    for i in 0..self.sample_pre_pixel {
-                        let ray = self.get_ray(&start_pos,w,h,&mut rng);
-                        let color = ray.get_color(s,depth);
-                        r += color.r() as f64;
-                        g += color.g() as f64;
-                        b += color.b() as f64;
+            let depth_copy = depth;
+            let shared_s_clone = Arc::clone(&shared_s);
+            let shared_c_clone = Arc::clone(&shared_c);
+            let shared_img_clone = Arc::clone(&shared_img);
+            let shared_thread_num_clone = Arc::clone(&shared_thread_num);
+
+            let handle = thread::spawn(move || {
+                let mut rng = thread_rng();
+                {
+                    let mut num = shared_thread_num_clone.lock().unwrap();
+                    *num += 1;
+                }
+                for w in 0..sw {
+                    let start_pos = &shared_c_clone.get_piexl_view_pos_start_pos();
+                    let color = match shared_c_clone.sample_pre_pixel > 1 {
+                        true => {
+                            let mut r = 0.0;
+                            let mut g = 0.0;
+                            let mut b = 0.0;
+                            let rate: f64 = 1.0 / shared_c_clone.sample_pre_pixel as f64;
+                            for i in 0..shared_c_clone.sample_pre_pixel {
+                                let ray = Camera::get_ray(&shared_c_clone,start_pos,w,h,&mut rng);
+                                let color = ray.get_color(&shared_s_clone,depth);
+                                r += color.r() as f64;
+                                g += color.g() as f64;
+                                b += color.b() as f64;
+                            }
+                            let cr = (r * rate) as u8;
+                            let cg = (g * rate) as u8;
+                            let cb = (b * rate) as u8;
+                            Color::new(cr, cg, cb, 255u8)
+                        },
+                        false => {
+                            let dir = shared_c_clone.get_piexl_view_pos(start_pos,w,h);
+                            let pos = shared_c_clone.pos;
+                            let ray = Ray::new(pos,dir - pos);
+                            ray.get_color(&shared_s_clone,depth_copy)
+                        }
+                    };
+                    match shared_img_clone.lock().unwrap().set_pixel(w, h, color) {
+                        Err(msg) => {
+                            panic!("{}",msg);
+                        },
+                        _ => (),
                     }
-                    let cr = (r * rate) as u8;
-                    let cg = (g * rate) as u8;
-                    let cb = (b * rate) as u8;
-                    color = Color::new(cr, cg, cb, 255u8);
                 }
-                else {
-                    let dir = self.get_piexl_view_pos(&start_pos, w, h);
-                    let ray = Ray::new(self.get_pos(),dir - self.get_pos());
-                    color = ray.get_color(s,depth);
+                {
+                    let mut num = shared_thread_num_clone.lock().unwrap();
+                    *num -= 1;
                 }
-                match img.set_pixel(w, h, color) {
-                    Err(msg) => {
-                        panic!("{}",msg);
-                    },
-                    _ => (),
-                }
+            }); 
+
+            //大于16个线程时
+            while *shared_thread_num.lock().unwrap() > 16 {
+
             }
+            println!("remaining:{} line(s)",sh - h);
         }
+        while *shared_thread_num.lock().unwrap() > 0 {
+
+        }
+        let img = (*shared_img.lock().unwrap()).clone();
         img
     }
 
