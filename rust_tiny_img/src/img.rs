@@ -57,4 +57,8 @@ impl Img {
     pub fn get_bytes_size(&self) -> u32 {
         4 * self.pixels.len() as u32
     }
+
+    pub fn liner_to_gamma(&mut self) {
+        self.pixels.iter_mut().for_each(|c| c.liner_to_gamma());
+    }
 }

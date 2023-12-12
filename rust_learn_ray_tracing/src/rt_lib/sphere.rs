@@ -24,7 +24,7 @@ impl Sphere {
 
         //随机漫反射
         let mut rng = thread_rng();
-        let mut o = Vector3::random(&mut rng, -1.0, 1.0);
+        let mut o = Vector3::random(&mut rng, -1.0, 1.0) + *normal;
         o.normallize();
         match o.dot(normal) > 0.0 {
             true => o,
@@ -44,11 +44,11 @@ impl Geometry for Sphere {
             true => HitReultEnum::None,
             false => {
                 let sqrtd = discriminant.sqrt();
-                let mut t = (-b-sqrtd)/(a * 2.0);
+                let mut t = (-b - sqrtd)/(a * 2.0);
                 if t < 0.0 {
                     t = (-b + sqrtd)/(a * 2.0);
                 }
-                if t < 0.0 {
+                if t < 1e-10 {
                     return HitReultEnum::None;
                 }
                 let pos = ray.at(t);

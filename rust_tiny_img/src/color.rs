@@ -54,6 +54,13 @@ impl Color {
         let a= (color_a.a as f64 * a_rate + color_b.a as f64 * b_rate) as u8;
         return Ok(Color::new(r, g, b, a));
     }
+
+    pub fn liner_to_gamma(&mut self) {
+        self.r = ((self.r as f64 / 255.0).sqrt() * 255.0) as u8;
+        self.g = ((self.g as f64 / 255.0).sqrt() * 255.0) as u8;
+        self.b = ((self.b as f64 / 255.0).sqrt() * 255.0) as u8;
+        self.a = ((self.a as f64 / 255.0).sqrt() * 255.0) as u8;
+    }
 }
 
 impl PartialEq for Color {

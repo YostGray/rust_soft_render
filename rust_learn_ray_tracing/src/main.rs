@@ -20,11 +20,12 @@ fn main(){
     );
 
     let start = std::time::Instant::now();
-    let img = c.render(s,50);
+    let mut img = c.render(s,50);
     let duration = start.elapsed();
     println!("Time cost in render() is: {:?}", duration);
+    img.liner_to_gamma();
 
-    match bmp::save_as_file(&img, "./test_out/test09.bmp",BitDepth::AllColors) {
+    match bmp::save_as_file(&img, "./test_out/test09-9.5.bmp",BitDepth::AllColors) {
         Err(msg) => {
             panic!("{}",msg);
         },
