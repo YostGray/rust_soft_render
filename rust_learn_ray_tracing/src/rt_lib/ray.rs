@@ -1,8 +1,5 @@
-use rust_tiny_img::color::Color;
-
 use super::scene::Scene;
 use super::{vector3::Vector3, geometry::Geometry};
-use super::geometry::HitReultEnum;
 
 pub struct Ray{
     ori : Vector3,
@@ -26,18 +23,20 @@ impl Ray {
         self.ori + self.dir * t
     }
 
-    pub fn get_color(&self, s:&Scene, depth:u64) -> Color{
+    pub fn get_color(&self, s:&Scene, depth:u64) -> Vector3{
         if depth <= 0  {
-            return Color::get_black();
+            return Vector3::new(0.0, 0.0, 0.0);
         }
         match s.try_hit(self) {
-            HitReultEnum::Ruslt(r) => {
+            Option::Some(r) => {
                 let reflect_ray = Ray::new(r.get_pos().clone(), r.get_reflect_dir().clone());
-                reflect_ray.get_color(s,depth - 1) * 0.5
+                let m = r.get_mat();
+                let reflect_rate = m.get_mult_value(r.get_into_dir(), r.get_normal());
+                reflect_rate * (reflect_ray.get_color(s,depth - 1) * 0.5)
             },
-            HitReultEnum::None => {
+            Option::None => {
                 let test = 0.5 * (self.dir.get_y() + 1.0);
-                Color::get_white() *(1.0 - test) + Color::new(127u8, 178u8, 255u8, 255u8) * test
+                Vector3::new(1.0, 1.0, 1.0) * (1.0 - test) + Vector3::new(127.0 / 255.0, 178.0 / 255.0, 255.0 / 255.0) * test
             },
         }
     }

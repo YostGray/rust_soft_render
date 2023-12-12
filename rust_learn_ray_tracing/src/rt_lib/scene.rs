@@ -1,6 +1,6 @@
 use std::f64::INFINITY;
 
-use super::geometry::{Geometry, HitReultEnum};
+use super::geometry::{Geometry, HitResult};
 
 
 ///the scene which would be render
@@ -25,18 +25,18 @@ impl Scene {
 }
 
 impl Geometry for Scene {
-    fn try_hit(&self,ray:&super::ray::Ray) -> HitReultEnum {
+    fn try_hit(&self,ray:&super::ray::Ray) -> Option<HitResult> {
         let mut min_t = INFINITY;
-        let mut result = HitReultEnum::None;
+        let mut result = Option::None;
         for o in &self.obj_list {
             match o.try_hit(ray) {
-                HitReultEnum::Ruslt(r) => {
+                Option::Some(r) => {
                     if min_t > r.get_t() {
                         min_t = r.get_t();
-                        result = HitReultEnum::Ruslt(r);
+                        result = Option::Some(r);
                     }
                 },
-                HitReultEnum::None => (),
+                Option::None => (),
             }
         }
         result

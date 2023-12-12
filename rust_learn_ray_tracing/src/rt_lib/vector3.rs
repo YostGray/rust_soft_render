@@ -1,4 +1,4 @@
-use std::ops::{Add, Sub, Neg, AddAssign, Mul, Div, DivAssign};
+use std::ops::{Add, Sub, Neg, AddAssign, Mul, Div, DivAssign, MulAssign};
 
 use rand::{rngs::ThreadRng, Rng};
 
@@ -77,6 +77,18 @@ impl Neg for Vector3 {
     }
 }
 
+impl Mul for Vector3 {
+    type Output = Vector3;
+
+    fn mul(self, rhs: Vector3) -> Self::Output {
+        Vector3 {
+            x:self.x * rhs.x,
+            y:self.y * rhs.y,
+            z:self.z * rhs.z,
+        }
+    }
+}
+
 impl Mul<f64> for Vector3 {
     type Output = Vector3;
 
@@ -121,6 +133,14 @@ impl AddAssign for Vector3 {
         self.x += rhs.x;
         self.y += rhs.y;
         self.z += rhs.z;
+    }
+}
+
+impl MulAssign<f64> for Vector3 {
+    fn mul_assign(&mut self, rhs: f64) {
+        self.x *= rhs;
+        self.y *= rhs;
+        self.z *= rhs;
     }
 }
 

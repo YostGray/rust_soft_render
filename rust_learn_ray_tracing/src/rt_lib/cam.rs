@@ -2,7 +2,7 @@ use std::{thread, sync::{Arc, Mutex}, time::Duration};
 
 use rust_tiny_img::{img::Img, color::{Color, self}};
 use rand::{Rng, thread_rng, rngs::ThreadRng};
-use crate::rt_lib::ray::Ray;
+use crate::rt_lib::{ray::Ray, vector3};
 use super::{vector3::Vector3, scene::Scene};
 
 /// the view point to render scene.
@@ -137,27 +137,28 @@ impl Camera {
                     let start_pos = &shared_c_clone.get_piexl_view_pos_start_pos();
                     let color = match shared_c_clone.sample_pre_pixel > 1 {
                         true => {
-                            let mut r = 0.0;
-                            let mut g = 0.0;
-                            let mut b = 0.0;
-                            let rate: f64 = 1.0 / shared_c_clone.sample_pre_pixel as f64;
+                            let mut out_vector3 = Vector3::new(0.0, 0.0, 0.0);
+                            let rate: f64 = 255.0 / shared_c_clone.sample_pre_pixel as f64;
                             for i in 0..shared_c_clone.sample_pre_pixel {
                                 let ray = Camera::get_ray(&shared_c_clone,start_pos,w,h,&mut rng);
-                                let color = ray.get_color(&shared_s_clone,depth);
-                                r += color.r() as f64;
-                                g += color.g() as f64;
-                                b += color.b() as f64;
+                                let vector3 = ray.get_color(&shared_s_clone,depth);
+                                out_vector3 += vector3;
                             }
-                            let cr = (r * rate) as u8;
-                            let cg = (g * rate) as u8;
-                            let cb = (b * rate) as u8;
+                            out_vector3 *= rate;
+                            let cr = out_vector3.get_x() as u8;
+                            let cg = out_vector3.get_y() as u8;
+                            let cb = out_vector3.get_z() as u8;
                             Color::new(cr, cg, cb, 255u8)
                         },
                         false => {
                             let dir = shared_c_clone.get_piexl_view_pos(start_pos,w,h);
                             let pos = shared_c_clone.pos;
                             let ray = Ray::new(pos,dir - pos);
-                            ray.get_color(&shared_s_clone,depth_copy)
+                            let out_vector3 = ray.get_color(&shared_s_clone,depth_copy) * 255.0;
+                            let cr = out_vector3.get_x() as u8;
+                            let cg = out_vector3.get_y() as u8;
+                            let cb = out_vector3.get_z() as u8;
+                            Color::new(cr, cg, cb, 255u8)
                         }
                     };
                     match shared_img_clone.lock().unwrap().set_pixel(w, h, color) {
