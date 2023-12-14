@@ -1,4 +1,4 @@
-use std::ops::{Add, Sub, Neg, AddAssign, Mul, Div, DivAssign, MulAssign};
+use std::{ops::{Add, Sub, Neg, AddAssign, Mul, Div, DivAssign, MulAssign}, f64::consts::PI};
 
 use rand::{rngs::ThreadRng, Rng};
 
@@ -192,6 +192,16 @@ impl Vector3 {
             x:rng.gen_range(min..max),
             y:rng.gen_range(min..max),
             z:rng.gen_range(min..max),
+        }
+    }
+    pub fn random_unit_vector(rng:&mut ThreadRng) -> Vector3 {
+        let a = rng.gen_range(0.0..2.0*PI);
+        let z = rng.gen_range(-1.0.. 1.0);
+        let r = (1.0f64 - z*z).sqrt();
+        Vector3 {
+            x:r * a.cos(),
+            y:r * a.sin(),
+            z,
         }
     }
 }

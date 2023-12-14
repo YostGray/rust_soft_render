@@ -1,4 +1,4 @@
-use std::{thread, sync::{Arc, Mutex}, time::Duration};
+use std::{thread, sync::{Arc, Mutex}, time::Duration, io::{BufWriter, self}};
 
 use rust_tiny_img::{img::Img, color::{Color, self}};
 use rand::{Rng, thread_rng, rngs::ThreadRng};
@@ -26,6 +26,7 @@ pub struct Camera {
     vh_step : f64,
 
     sample_pre_pixel:u64,
+    ray_deepth:u64,
 }
 
 impl Default for Camera {
@@ -44,12 +45,13 @@ impl Default for Camera {
             vw_step: Default::default(), 
             vh_step: Default::default(), 
             sample_pre_pixel : 1,
+            ray_deepth : 50,
         }
     }
 }
 
 impl Camera {
-    pub fn new(w:u32, h:u32, pos:Vector3, dir:Vector3, dir_w:Vector3, near:f64, fov_w:f64,sample_pre_pixel : u64) -> Camera{
+    pub fn new(w:u32, h:u32, pos:Vector3, dir:Vector3, dir_w:Vector3, near:f64, fov_w:f64,sample_pre_pixel : u64,ray_deepth : u64) -> Camera{
         let view_w = (fov_w / 2f64).to_radians().tan() * near;
         let view_h = view_w * h as f64 / w as f64;
         let vw_step = view_w / w as f64;
@@ -71,6 +73,7 @@ impl Camera {
             vw_step,
             vh_step,
             sample_pre_pixel,
+            ray_deepth,
         }
     }
 
@@ -120,6 +123,7 @@ impl Camera {
         let mut thread_num = 0;
         let shared_thread_num = Arc::new(Mutex::new(thread_num));
 
+        let mut std_out: BufWriter<io::Stdout> = BufWriter::new(io::stdout());
         for h in 0..sh {
             let depth_copy = depth;
             let shared_s_clone = Arc::clone(&shared_s);
@@ -178,7 +182,7 @@ impl Camera {
             while *shared_thread_num.lock().unwrap() > 16 {
 
             }
-            println!("remaining:{} line(s)",sh - h);
+            crate::rt_lib::show_progress(&mut std_out, (h as f64  * 100.0/ sh as f64 ).ceil());
         }
         while *shared_thread_num.lock().unwrap() > 0 {
 

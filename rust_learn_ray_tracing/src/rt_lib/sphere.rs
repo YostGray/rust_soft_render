@@ -22,8 +22,8 @@ impl Sphere {
 
 impl Geometry for Sphere {
     fn try_hit(&self,ray:&Ray) -> Option<HitResult> {
-        let cq = self.pos - ray.get_ori().clone();
-        let a = ray.get_dir().dot(ray.get_dir());
+        let cq = self.pos - *ray.get_ori();
+        let a = ray.get_dir().length_sqr();
         let b = (ray.get_dir() * -2.0f64).dot(&cq);
         let c = cq.dot(&cq) - self.r * self.r;
         let discriminant  = b * b - 4.0 * a * c;
@@ -32,17 +32,17 @@ impl Geometry for Sphere {
             false => {
                 let sqrtd = discriminant.sqrt();
                 let mut t = (-b - sqrtd)/(a * 2.0);
-                if t < 0.0 {
+                if t < 1e-5 {
                     t = (-b + sqrtd)/(a * 2.0);
                 }
-                if t < 1e-10 {
+                if t < 1e-5 {
                     return Option::None;
                 }
-                let pos = ray.at(t);
-                let mut normal = pos - self.pos;
+                let hit_pos = ray.at(t);
+                let mut normal = (hit_pos - self.pos) / self.r;
                 normal.normallize();
                 let mat = Arc::clone(&self.mat);
-                Option::Some(HitResult::new(ray, t, pos, normal, &mat))
+                Option::Some(HitResult::new(ray,t,hit_pos,normal, &mat))
             },
         }
     }

@@ -28,14 +28,17 @@ impl Ray {
             return Vector3::new(0.0, 0.0, 0.0);
         }
         match s.try_hit(self) {
-            Option::Some(r) => {
-                let reflect_ray = Ray::new(r.get_pos().clone(), r.get_reflect_dir().clone());
-                let m = r.get_mat();
-                let reflect_rate = m.get_mult_value(r.get_into_dir(), r.get_normal());
-                reflect_rate * (reflect_ray.get_color(s,depth - 1) * 0.5)
+            Option::Some(hr) => {
+                let reflect_ray = Ray::new(hr.get_pos().clone(), hr.get_out_dir().clone());
+                let eval_color = hr.get_eval_color().clone();
+                let c = eval_color * (reflect_ray.get_color(s,depth - 1));
+                return c;
             },
             Option::None => {
                 let test = 0.5 * (self.dir.get_y() + 1.0);
+                if depth == 49 {
+                    s.try_hit(self);
+                }
                 Vector3::new(1.0, 1.0, 1.0) * (1.0 - test) + Vector3::new(127.0 / 255.0, 178.0 / 255.0, 255.0 / 255.0) * test
             },
         }

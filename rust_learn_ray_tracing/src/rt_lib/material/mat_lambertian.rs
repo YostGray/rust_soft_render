@@ -11,17 +11,17 @@ impl Lambertian {
 }
 
 impl super::Mat for Lambertian {
-    fn gen_out_dir(&self, into:&Vector3, normal:&Vector3) -> Vector3 {
+    fn gen_mat_result(&self, hit_result:&mut HitResult){
+        let n = hit_result.get_normal();
         let mut rng = thread_rng();
-        let mut o = Vector3::random(&mut rng, -1.0, 1.0) + *normal;
-        o.normallize();
-        match o.dot(normal) > 0.0 {
+        let mut o = Vector3::random_unit_vector(&mut rng) + *n;
+        o = match o.dot(n) > 0.0 {
             true => o,
             false => -o,
-        }
-    }
+        };
+        o.normallize();
 
-    fn get_mult_value(&self, into:&Vector3, normal:&Vector3) -> Vector3 {
-        self.albedo
+        hit_result.set_out_dir(o);
+        hit_result.set_eval_color(self.albedo);
     }
 }

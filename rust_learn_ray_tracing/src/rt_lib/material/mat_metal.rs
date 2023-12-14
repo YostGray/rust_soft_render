@@ -12,10 +12,10 @@ impl Metal {
 }
 
 impl super::Mat for Metal {
-    fn gen_out_dir(&self, into:&Vector3, normal:&Vector3) -> Vector3 {
-        let i = -into.clone();
-        let mut o = -i + normal * 2.0 * i.dot(normal);
-
+    fn gen_mat_result(&self, hit_result:&mut HitResult){
+        let n = hit_result.get_normal();
+        let i = -hit_result.get_in_dir().clone();
+        let mut o = -i + n * 2.0 * i.dot(n);
         if self.fuzz > 0.0001 {
             let mut rng = thread_rng();
             let mut random = Vector3::random(&mut rng, -1.0, 1.0);
@@ -28,10 +28,7 @@ impl super::Mat for Metal {
             o += random;
         }
 
-        return o;
-    }
-
-    fn get_mult_value(&self, into:&Vector3, normal:&Vector3) -> Vector3 {
-        self.albedo
+        hit_result.set_out_dir(o);
+        hit_result.set_eval_color(self.albedo);
     }
 }
