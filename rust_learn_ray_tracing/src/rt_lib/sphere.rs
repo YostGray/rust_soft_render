@@ -2,7 +2,7 @@ use std::{rc::Rc, sync::Arc};
 
 use rand::thread_rng;
 
-use super::{vector3::Vector3, geometry::{Geometry, HitResult}, ray::Ray, material::Mat};
+use super::{vector3::Vector3, geometry::{Hitable, HitResult}, ray::Ray, material::Mat};
 
 pub struct Sphere{
     r:f64,
@@ -20,7 +20,7 @@ impl Sphere {
     }
 }
 
-impl Geometry for Sphere {
+impl Hitable for Sphere {
     fn try_hit(&self,ray:&Ray) -> Option<HitResult> {
         let cq = self.pos - *ray.get_ori();
         let a = ray.get_dir().length_sqr();

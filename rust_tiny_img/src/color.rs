@@ -118,7 +118,7 @@ mod test_color {
     use super::*;
 
     #[test]
-    fn sample_tests() {
+    fn color_simple_test() {
         let mut black = Color::new(255, 255, 255, 255);
         let mut white = Color::new(0, 0, 0, 255);
         black.color_to_gray();

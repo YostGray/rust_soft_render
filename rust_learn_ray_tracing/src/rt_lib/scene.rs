@@ -1,11 +1,11 @@
 use std::f64::INFINITY;
 
-use super::geometry::{Geometry, HitResult};
+use super::geometry::{Hitable, HitResult};
 
 
 ///the scene which would be render
 pub struct Scene {
-    obj_list:Vec<Box<dyn Geometry + Sync + Send>>,
+    obj_list:Vec<Box<dyn Hitable + Sync + Send>>,
 }
 
 impl Scene {
@@ -15,16 +15,16 @@ impl Scene {
         } 
     }
 
-    pub fn add_obj(&mut self,obj:Box<dyn Geometry + Sync + Send>) {
+    pub fn add_obj(&mut self,obj:Box<dyn Hitable + Sync + Send>) {
         self.obj_list.push(obj);
     }
 
-    fn get_obj_vec(&self) -> &Vec<Box<dyn Geometry + Sync + Send>>{
+    fn get_obj_vec(&self) -> &Vec<Box<dyn Hitable + Sync + Send>>{
         &self.obj_list
     }
 }
 
-impl Geometry for Scene {
+impl Hitable for Scene {
     fn try_hit(&self,ray:&super::ray::Ray) -> Option<HitResult> {
         let mut min_t = INFINITY;
         let mut result = Option::None;

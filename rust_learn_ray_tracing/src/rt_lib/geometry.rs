@@ -53,11 +53,6 @@ impl HitResult {
     pub fn get_eval_color(&self) -> &Vector3 { &self.eval_color }
 }
 
-pub enum HitReultEnum{
-    None,
-    Ruslt(HitResult),
-}
-
-pub trait Geometry {
+pub trait Hitable {
     fn try_hit(&self,ray:&Ray) -> Option<HitResult>;
 }

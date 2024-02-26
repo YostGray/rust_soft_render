@@ -1,5 +1,5 @@
 use super::scene::Scene;
-use super::{vector3::Vector3, geometry::Geometry};
+use super::{vector3::Vector3, geometry::Hitable};
 
 pub struct Ray{
     ori : Vector3,
