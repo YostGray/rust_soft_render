@@ -1,61 +1,48 @@
+use std::{rc::Rc, sync::Arc};
+
 use rand::thread_rng;
 
-use super::{vector3::Vector3, geometry::{Geometry, HitReultEnum, HitResult}, ray::Ray};
+use super::{vector3::Vector3, geometry::{Hitable, HitResult}, ray::Ray, material::Mat};
 
 pub struct Sphere{
     r:f64,
     pos:Vector3,
+    mat:Arc<dyn Mat + Send + Sync>,
 }
 
 impl Sphere {
-    pub fn new(pos:&Vector3,r:f64) -> Sphere {
+    pub fn new(pos:&Vector3,r:f64,mat:Arc<dyn Mat + Send + Sync>) -> Sphere {
         Sphere{
             r,
             pos:pos.clone(),
-        }
-    }
-
-    fn get_reflect_dir(&self, ray:&Ray, normal:&Vector3) -> Vector3 {
-        // //镜面反射
-        // let n = normal;
-        // let i = -ray.get_dir().clone();
-        // let o = -i + n * 2.0 * i.dot(n);
-        // return o;
-
-        //随机漫反射
-        let mut rng = thread_rng();
-        let mut o = Vector3::random(&mut rng, -1.0, 1.0);
-        o.normallize();
-        match o.dot(normal) > 0.0 {
-            true => o,
-            false => -o,
+            mat,
         }
     }
 }
 
-impl Geometry for Sphere {
-    fn try_hit(&self,ray:&Ray) -> HitReultEnum {
-        let cq = self.pos - ray.get_ori().clone();
-        let a = ray.get_dir().dot(ray.get_dir());
+impl Hitable for Sphere {
+    fn try_hit(&self,ray:&Ray) -> Option<HitResult> {
+        let cq = self.pos - *ray.get_ori();
+        let a = ray.get_dir().length_sqr();
         let b = (ray.get_dir() * -2.0f64).dot(&cq);
         let c = cq.dot(&cq) - self.r * self.r;
         let discriminant  = b * b - 4.0 * a * c;
         match discriminant < 0.0 {
-            true => HitReultEnum::None,
+            true => Option::None,
             false => {
                 let sqrtd = discriminant.sqrt();
-                let mut t = (-b-sqrtd)/(a * 2.0);
-                if t < 0.0 {
+                let mut t = (-b - sqrtd)/(a * 2.0);
+                if t < 1e-5 {
                     t = (-b + sqrtd)/(a * 2.0);
                 }
-                if t < 0.0 {
-                    return HitReultEnum::None;
+                if t < 1e-5 {
+                    return Option::None;
                 }
-                let pos = ray.at(t);
-                let mut normal = pos - self.pos;
+                let hit_pos = ray.at(t);
+                let mut normal = (hit_pos - self.pos) / self.r;
                 normal.normallize();
-                let reflect_dir = self.get_reflect_dir(ray,&normal);
-                HitReultEnum::Ruslt(HitResult::new(pos, normal, t, reflect_dir))
+                let mat = Arc::clone(&self.mat);
+                Option::Some(HitResult::new(ray,t,hit_pos,normal, &mat))
             },
         }
     }

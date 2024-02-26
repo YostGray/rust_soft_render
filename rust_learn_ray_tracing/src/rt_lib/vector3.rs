@@ -1,4 +1,4 @@
-use std::ops::{Add, Sub, Neg, AddAssign, Mul, Div, DivAssign};
+use std::{ops::{Add, Sub, Neg, AddAssign, Mul, Div, DivAssign, MulAssign}, f64::consts::PI};
 
 use rand::{rngs::ThreadRng, Rng};
 
@@ -77,6 +77,18 @@ impl Neg for Vector3 {
     }
 }
 
+impl Mul for Vector3 {
+    type Output = Vector3;
+
+    fn mul(self, rhs: Vector3) -> Self::Output {
+        Vector3 {
+            x:self.x * rhs.x,
+            y:self.y * rhs.y,
+            z:self.z * rhs.z,
+        }
+    }
+}
+
 impl Mul<f64> for Vector3 {
     type Output = Vector3;
 
@@ -121,6 +133,14 @@ impl AddAssign for Vector3 {
         self.x += rhs.x;
         self.y += rhs.y;
         self.z += rhs.z;
+    }
+}
+
+impl MulAssign<f64> for Vector3 {
+    fn mul_assign(&mut self, rhs: f64) {
+        self.x *= rhs;
+        self.y *= rhs;
+        self.z *= rhs;
     }
 }
 
@@ -172,6 +192,16 @@ impl Vector3 {
             x:rng.gen_range(min..max),
             y:rng.gen_range(min..max),
             z:rng.gen_range(min..max),
+        }
+    }
+    pub fn random_unit_vector(rng:&mut ThreadRng) -> Vector3 {
+        let a = rng.gen_range(0.0..2.0*PI);
+        let z = rng.gen_range(-1.0.. 1.0);
+        let r = (1.0f64 - z*z).sqrt();
+        Vector3 {
+            x:r * a.cos(),
+            y:r * a.sin(),
+            z,
         }
     }
 }
